@@ -1062,26 +1062,28 @@
 
 .home-flag-ribbon {
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 0 auto 1.25rem;
   padding: 0 1.25rem;
 }
 
 .home-flag-ribbon__link {
   display: block;
   text-decoration: none;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(42, 58, 143, 0.18);
+  border: 2px solid var(--media-frame-border);
 }
 
 .home-flag-ribbon__img {
   width: 100%;
   height: auto;
-  max-height: 160px;
-  object-fit: contain;
-  border-radius: var(--gov-radius);
+  min-height: 160px;
+  max-height: min(42vh, 320px);
+  object-fit: cover;
+  object-position: center 45%;
   display: block;
-  background: var(--media-frame-bg);
-  padding: var(--media-inset);
-  border: 1px solid var(--media-frame-border);
-  box-sizing: border-box;
+  background: #0a1628;
 }
 
 .home-press__hero-card--featured {

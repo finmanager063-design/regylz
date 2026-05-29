@@ -1,5 +1,9 @@
 import { getContent, getArticles } from "@/lib/content";
-import { MAKAROV_ARTICLE_ID, MAKAROV_AWARD_IMAGE } from "@/lib/makarov-media";
+import {
+  MAKAROV_ARTICLE_ID,
+  MAKAROV_AWARD_IMAGE,
+  MAKAROV_GOV_UPLOAD,
+} from "@/lib/makarov-media";
 import { HOME_RIBBON_IMAGE } from "@/lib/site-media";
 import { extractNewsImage, sortNewsByDate } from "@/lib/news-media";
 
@@ -14,8 +18,10 @@ function normalizeSrc(src: string): string {
   return src.split("?")[0].toLowerCase();
 }
 
+/** Не показывать на главной: фото награды / рукопожатия (только в статье Макарова). */
 const EXCLUDED_ON_HOME = new Set([
   normalizeSrc(MAKAROV_AWARD_IMAGE),
+  normalizeSrc(MAKAROV_GOV_UPLOAD),
 ]);
 
 function addUnique(
