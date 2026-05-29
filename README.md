@@ -10,6 +10,8 @@
 
 Включите Pages в репозитории, если ещё не включены: *Settings → Pages → Source: GitHub Actions*.
 
+**Git:** только аккаунт [finmanager063-design](https://github.com/finmanager063-design) — см. [docs/GIT-ACCOUNTS.md](docs/GIT-ACCOUNTS.md). SSH `vladymyrzaicenko1992-ai` для этого репо не использовать.
+
 ## Локальная разработка
 
 ```bash

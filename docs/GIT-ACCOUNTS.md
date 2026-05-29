@@ -8,7 +8,7 @@
 
 ## Как пушить
 
-1. Создайте PAT в аккаунте **finmanager063-design** (scopes: `repo`, `workflow` для Actions).
+1. Создайте PAT в аккаунте **finmanager063-design** (обязательно scopes: **`repo`** и **`workflow`** — без `workflow` GitHub отклонит push файлов в `.github/workflows/`).
 2. Один раз в терминале:
 
 ```bash
