@@ -1039,6 +1039,423 @@
   color: var(--gov-blue);
 }
 
+/* === Страница контактов (gov.kz / госуслуги) === */
+.contacts-page {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.contacts-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2rem;
+  align-items: stretch;
+  margin-bottom: 2.5rem;
+  padding: 2rem 2.25rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1e2d6e 0%, #4053d4 55%, #00afc7 100%);
+  color: #fff;
+  box-shadow: 0 16px 48px rgba(30, 45, 110, 0.22);
+}
+
+.contacts-hero__badge {
+  display: inline-block;
+  margin: 0 0 0.75rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(254, 197, 12, 0.95);
+  color: #1a1a2e;
+  border-radius: 4px;
+}
+
+.contacts-hero__title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.contacts-hero__lead {
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  max-width: 560px;
+}
+
+.contacts-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.contacts-hero__btn-primary {
+  background: #fec50c;
+  color: #1a1a2e !important;
+  font-weight: 700;
+  padding: 0.85rem 1.5rem;
+}
+
+.contacts-hero__btn-primary:hover {
+  background: #ffe566;
+}
+
+.contacts-hero__btn-secondary {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #fff !important;
+  margin-left: 0;
+}
+
+.contacts-hero__btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.contacts-hero__visual {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  min-height: 200px;
+}
+
+.contacts-hero__img {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  max-height: 280px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contacts-section-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+  color: var(--gov-blue-dark);
+  border-bottom: 3px solid #fec50c;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.contacts-services {
+  margin-bottom: 2.5rem;
+}
+
+.contacts-services__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.contacts-service-card {
+  background: #fff;
+  border: 1px solid var(--gov-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--gov-shadow);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.contacts-service-card:hover {
+  border-color: #00afc7;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 175, 202, 0.15);
+}
+
+.contacts-service-card__icon {
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.contacts-service-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: var(--gov-blue-dark);
+}
+
+.contacts-service-card p {
+  margin: 0 0 0.85rem;
+  font-size: 0.88rem;
+  color: var(--gov-muted);
+  line-height: 1.5;
+}
+
+.contacts-service-card__link {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gov-blue);
+  text-decoration: none;
+}
+
+.contacts-service-card__link:hover {
+  text-decoration: underline;
+}
+
+.contacts-main-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  align-items: start;
+}
+
+.contacts-panel {
+  background: #fff;
+  border: 1px solid var(--gov-border);
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--gov-shadow);
+  margin-bottom: 1.25rem;
+}
+
+.contacts-panel--primary {
+  border-top: 4px solid var(--gov-blue);
+  margin-bottom: 0;
+}
+
+.contacts-panel__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+  color: var(--gov-blue-dark);
+}
+
+.contacts-panel__subtitle {
+  margin: 0 0 1.25rem;
+  color: var(--gov-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.contacts-bot-card {
+  background: linear-gradient(180deg, #f4f7ff 0%, #fff 100%);
+  border: 2px solid var(--gov-blue);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.contacts-bot-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2aabee, #229ed9);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 20px rgba(34, 158, 217, 0.35);
+}
+
+.contacts-bot-card__features {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  text-align: left;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--gov-text);
+}
+
+.contacts-bot-card__features li {
+  padding: 0.35rem 0 0.35rem 1.5rem;
+  position: relative;
+}
+
+.contacts-bot-card__features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #00afc7;
+  font-weight: 700;
+}
+
+.contacts-bot-card__btn {
+  width: 100%;
+  max-width: 320px;
+  font-size: 1rem;
+  padding: 0.9rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.contacts-bot-card__url {
+  margin: 0;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.contacts-bot-card__url a {
+  color: var(--gov-blue);
+}
+
+.contacts-channels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.contacts-channels__item--primary {
+  background: linear-gradient(90deg, #f0f9ff, #fff);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin: -0.5rem -0.5rem 0.5rem;
+  border: 1px solid #00afc7;
+}
+
+.contacts-channels li {
+  display: flex;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--gov-border);
+}
+
+.contacts-channels li:last-child {
+  border-bottom: none;
+}
+
+.contacts-channels__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.contacts-channels__label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gov-muted);
+  margin-bottom: 0.15rem;
+}
+
+.contacts-channels__value {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gov-blue);
+  text-decoration: none;
+}
+
+.contacts-channels__value:hover {
+  text-decoration: underline;
+}
+
+.contacts-channels__note {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gov-muted);
+  margin-top: 0.2rem;
+}
+
+.contacts-address {
+  font-style: normal;
+  line-height: 1.65;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.contacts-map {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--gov-border);
+  background: var(--media-frame-bg);
+}
+
+.contacts-map iframe {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border: 0;
+}
+
+.contacts-schedule th {
+  width: 42%;
+  font-weight: 600;
+  color: var(--gov-muted);
+  font-size: 0.85rem;
+}
+
+.contacts-steps-section {
+  margin-bottom: 2rem;
+}
+
+.contacts-steps-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.contacts-step-card {
+  background: #fff;
+  border: 1px solid var(--gov-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  box-shadow: var(--gov-shadow);
+}
+
+.contacts-step-card__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 0.65rem;
+  border-radius: 50%;
+  background: var(--gov-blue);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.contacts-step-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--gov-blue-dark);
+}
+
+.contacts-step-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--gov-muted);
+  line-height: 1.45;
+}
+
+.contacts-links-block {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .contacts-hero {
+    grid-template-columns: 1fr;
+  }
+  .contacts-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .contacts-steps-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .contacts-hero {
+    padding: 1.5rem 1.25rem;
+  }
+  .contacts-steps-cards {
+    grid-template-columns: 1fr;
+  }
+  .contacts-services__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* === Казахстан: баннеры, графики, галерея === */
 .kz-site-banner {
   max-width: 1280px;
