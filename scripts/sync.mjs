@@ -237,10 +237,11 @@ async function main() {
       "Агентство Республики Казахстан по регулированию и развитию финансового рынка",
     entityShort: "АРРФР",
     contacts: {
-      address: "050059, г. Алматы, мкр. «Коктем-3», д. 21",
-      phones: ["1459", "+7 (727) 237-10-00"],
-      emails: ["info@finreg.kz", "press@finreg.kz", "antifraud@finreg.kz"],
-      mapUrl: "https://yandex.ru/maps/-/CHv7AYmz",
+      telegram: {
+        username: "finance_regulator_bot",
+        handle: "@finance_regulator_bot",
+        url: "https://t.me/finance_regulator_bot",
+      },
     },
   };
 

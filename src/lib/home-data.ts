@@ -1,5 +1,10 @@
 /** Блок «Важно» как на gov.kz/memleket/entities/ardfm */
 export const HOME_IMPORTANT_LINKS = [
+  {
+    href: "https://t.me/finance_regulator_bot",
+    label: "Бот обращений @finance_regulator_bot",
+    external: true,
+  },
   { href: "/about/faq", label: "Часто задаваемые вопросы" },
   { href: "/activities/directions", label: "Повышение финансовой грамотности населения" },
   { href: "/articles", label: "Риск-ориентированный надзор" },

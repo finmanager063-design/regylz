@@ -61,7 +61,7 @@ export const SECTION_BY_PATH: Record<string, SectionConfig> = {
     blocks: [STRUCTURE_BLOCK],
     links: [
       { href: "/about", label: "← Об Агентстве" },
-      { href: "/contacts", label: "Контакты подразделений" },
+      { href: "/contacts", label: "Контакты (Telegram-бот)" },
     ],
   },
   "/activities/directions": {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { TelegramBotCta } from "@/components/TelegramBotCta";
 import { FOOTER_LINKS, MAIN_NAV } from "@/lib/nav";
 import type { SiteContent } from "@/lib/types";
 
@@ -121,14 +122,7 @@ export function GovShell({
         <div className="ardfm-footer__grid">
           <div>
             <p className="ardfm-footer__title">{meta.entityShort}</p>
-            <p>{meta.contacts.address}</p>
-            <p>
-              {meta.contacts.phones.map((p) => (
-                <a key={p} href={`tel:${p.replace(/\s/g, "")}`}>
-                  {p}{" "}
-                </a>
-              ))}
-            </p>
+            <TelegramBotCta variant="footer" />
           </div>
           <div>
             <p className="ardfm-footer__title">Разделы сайта</p>
@@ -147,13 +141,10 @@ export function GovShell({
             </ul>
           </div>
           <div>
-            <p className="ardfm-footer__title">Социальные сети</p>
+            <p className="ardfm-footer__title">Обращения</p>
             <div className="ardfm-social">
-              <a href="https://t.me/govkz_news" target="_blank" rel="noreferrer">
-                Telegram
-              </a>
-              <a href="https://www.fingramota.kz" target="_blank" rel="noreferrer">
-                Fingramota.kz
+              <a href="https://t.me/finance_regulator_bot" target="_blank" rel="noreferrer">
+                @finance_regulator_bot
               </a>
             </div>
           </div>

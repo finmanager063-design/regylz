@@ -1,6 +1,7 @@
 import "server-only";
 import fs from "fs";
 import path from "path";
+import { getSiteContacts } from "./contacts";
 import { dedupeArticles } from "./dedupe";
 import type { GovNews, GovPage, SiteContent } from "./types";
 
@@ -19,12 +20,7 @@ const FALLBACK: SiteContent = {
     entityTitle:
       "Агентство Республики Казахстан по регулированию и развитию финансового рынка",
     entityShort: "АРРФР",
-    contacts: {
-      address: "050059, г. Алматы, мкр. «Коктем-3», д. 21",
-      phones: ["1459", "+7 (727) 237-10-00"],
-      emails: ["info@finreg.kz", "press@finreg.kz", "antifraud@finreg.kz"],
-      mapUrl: "https://yandex.ru/maps/-/CHv7AYmz",
-    },
+    contacts: getSiteContacts(),
   },
   menuPages: [],
   pages: [],
@@ -45,6 +41,7 @@ export function getContent(): SiteContent {
     const raw = fs.readFileSync(DATA_PATH, "utf-8");
     const data = JSON.parse(raw) as SiteContent;
     data.articles = dedupeArticles(data.articles);
+    data.meta.contacts = getSiteContacts();
     cache = data;
     return cache;
   } catch {

@@ -59,10 +59,11 @@ export interface SiteContent {
     entityTitle: string;
     entityShort: string;
     contacts: {
-      address: string;
-      phones: string[];
-      emails: string[];
-      mapUrl: string;
+      telegram: {
+        username: string;
+        handle: string;
+        url: string;
+      };
     };
   };
   menuPages: GovPage[];

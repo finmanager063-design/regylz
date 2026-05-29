@@ -128,7 +128,7 @@ export default async function DynamicPage({ params }: Props) {
   }
 
   if (pathname === "/contacts") {
-    return <ContactsPage contacts={content.meta.contacts} />;
+    return <ContactsPage />;
   }
 
   // Поиск

@@ -922,10 +922,61 @@
   font-size: 0.85rem;
   color: var(--gov-muted);
 }
-.contacts-emails-note {
+.contacts-bot-hero {
+  text-align: center;
+  border: 2px solid var(--gov-blue);
+  background: linear-gradient(180deg, #f8f9ff 0%, #fff 100%);
+}
+
+.contacts-bot-lead {
+  font-size: 1.05rem;
+  max-width: 560px;
+  margin: 0 auto 1.25rem;
+  line-height: 1.55;
+}
+
+.contacts-bot-btn {
+  font-size: 1rem;
+  padding: 0.85rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.contacts-bot-hint {
   font-size: 0.875rem;
   color: var(--gov-muted);
+  max-width: 520px;
+  margin: 0 auto;
   line-height: 1.5;
+}
+
+.contacts-bot-footer a {
+  color: #7eb8ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.contacts-bot-footer a:hover {
+  text-decoration: underline;
+}
+
+.contacts-bot-footer span {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.875rem;
+}
+
+.contacts-bot-inline {
+  color: var(--gov-blue);
+  font-weight: 600;
+}
+
+.contacts-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.contacts-steps li {
+  margin-bottom: 0.65rem;
 }
 
 .map-placeholder {

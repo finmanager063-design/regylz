@@ -48,7 +48,7 @@ export const STRUCTURE_BLOCK = `
 export const FAQ_ITEMS = [
   {
     q: "Куда обратиться, если банк или МФО нарушает мои права?",
-    a: "Позвоните на горячую линию <strong>1459</strong> или направьте письмо на <strong>info@finreg.kz</strong>. Укажите наименование организации, суть спора и приложите документы.",
+    a: "Напишите в государственный Telegram-бот <a href=\"https://t.me/finance_regulator_bot\" target=\"_blank\" rel=\"noreferrer\"><strong>@finance_regulator_bot</strong></a>. Укажите организацию, суть спора и приложите документы.",
   },
   {
     q: "Чем АРРФР отличается от Национального Банка?",
@@ -64,7 +64,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Куда сообщить о финансовой пирамиде?",
-    a: "Напишите на <strong>antifraud@finreg.kz</strong> или позвоните на <strong>1459</strong>. Не переводите деньги организациям без лицензии АРРФР.",
+    a: "Сообщите через бот <a href=\"https://t.me/finance_regulator_bot\" target=\"_blank\" rel=\"noreferrer\"><strong>@finance_regulator_bot</strong></a>. Не переводите деньги организациям без лицензии АРРФР.",
   },
   {
     q: "Где узнать о финансовой грамотности?",
@@ -112,14 +112,6 @@ export const SUPERVISION_2026 = {
 `,
 };
 
-export const CONTACTS_EXTRA = `
-<h2>Режим работы</h2>
-<p>Приём обращений граждан: понедельник — пятница, 09:00–18:30 (обед 13:00–14:30), выходные — суббота, воскресенье.</p>
-<h2>Горячая линия</h2>
-<p>Единый номер <strong>1459</strong> (бесплатно с мобильных по РК) — консультации по вопросам финансового рынка и приёма обращений.</p>
-<h2>Обращения граждан</h2>
-<p>Письменные обращения направляйте на <strong>info@finreg.kz</strong> или по телефону горячей линии <strong>1459</strong>.</p>
-`;
 
 export const DOCUMENTS_INTRO = `
 <p>В разделе размещаются постановления Правления АРРФР, проекты нормативных правовых актов, отчёты, статистика и иные официальные материалы.</p>
@@ -176,7 +168,7 @@ export const ACTIVITIES_CROSSCUTTING_BLOCK = `
 <ul>
   <li><strong>Риск-ориентированный надзор</strong> — надзорные меры пропорциональны уровню риска организации для клиентов и системы (<a href="/articles">материалы</a>);</li>
   <li><strong>Финансовая грамотность</strong> — проект <a href="https://www.fingramota.kz" target="_blank" rel="noreferrer">fingramota.kz</a>, обучающие программы для населения и МСБ;</li>
-  <li><strong>Противодействие мошенничеству</strong> — выявление финансовых пирамид, канал <strong>antifraud@finreg.kz</strong>;</li>
+  <li><strong>Противодействие мошенничеству</strong> — сообщения о пирамидах и мошенничестве через бот <a href="https://t.me/finance_regulator_bot">@finance_regulator_bot</a>;</li>
   <li><strong>Государственные услуги</strong> — лицензирование и регистрация через цифровые сервисы;</li>
   <li><strong>Международное сотрудничество</strong> — взаимодействие с надзорными органами и стандартами IOSCO, IAIS, Basel Committee.</li>
 </ul>
