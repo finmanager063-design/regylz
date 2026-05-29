@@ -9,7 +9,10 @@ import type { GovNews, GovPage, SiteContent } from "./types";
 export { dedupeArticles };
 
 export function getArticles() {
-  return dedupeArticles([...FEATURED_ARTICLES, ...getContent().articles]);
+  const merged = dedupeArticles([...FEATURED_ARTICLES, ...getContent().articles]);
+  return merged.sort((a, b) =>
+    (b.publication_date ?? "").localeCompare(a.publication_date ?? ""),
+  );
 }
 
 export function findArticleById(id: string) {

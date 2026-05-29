@@ -15,7 +15,6 @@ export function mediaSrc(path: string): string {
 
 /** Фото для галерей: локальные SVG + типовые кадры с портала gov.kz. */
 export const GALLERY_PHOTOS = [
-  { src: KZ_IMAGES.presidentAward, alt: "Благодарность Президента РК", caption: "Государственное признание" },
   { src: KZ_IMAGES.flagBanner, alt: "Символика Казахстана", caption: "АРРФР" },
   { src: KZ_IMAGES.chartSectors, alt: "Секторы финансового рынка", caption: "Надзор по секторам" },
   { src: KZ_IMAGES.chartGrowth, alt: "Динамика защиты прав", caption: "Потребители финуслуг" },
@@ -38,5 +37,10 @@ export const GALLERY_PHOTOS = [
     src: govMediaUrl("/uploads/2020/12/11/2e5403d397682e4c5711c65f9368282a_original.220048.jpg"),
     alt: "Поддержка МСБ",
     caption: "Государственные программы",
+  },
+  {
+    src: KZ_IMAGES.presidentAward,
+    alt: "Благодарность Президента РК, 2025",
+    caption: "Материалы 2025",
   },
 ] as const;

@@ -67,13 +67,6 @@ export const FEATURED_ARTICLES: SiteContent["articles"] = [
   },
 ];
 
-export const FEATURED_HOME_HERO = {
-  articleId: MAKAROV_ID,
-  title: "Благодарность Президента РК: награда Сергею Макарову",
-  image: KZ_IMAGES.presidentAward,
-  date: "2025-11-20T10:00:00Z",
-} as const;
-
 export function isFeaturedArticleId(id: string): boolean {
   return id === MAKAROV_ID;
 }
