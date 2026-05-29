@@ -15,12 +15,14 @@ export function HomePage() {
     <div className="home-page">
       {ribbon && (
         <div className="home-flag-ribbon">
-          <GovImage
-            src={ribbon.src}
-            alt={ribbon.alt}
-            className="home-flag-ribbon__img"
-            loading="eager"
-          />
+          <Link href={ribbon.href} className="home-flag-ribbon__link">
+            <GovImage
+              src={ribbon.src}
+              alt={ribbon.alt}
+              className="home-flag-ribbon__img"
+              loading="eager"
+            />
+          </Link>
         </div>
       )}
       <HomePressHub />

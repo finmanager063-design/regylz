@@ -1066,6 +1066,11 @@
   padding: 0 1.25rem;
 }
 
+.home-flag-ribbon__link {
+  display: block;
+  text-decoration: none;
+}
+
 .home-flag-ribbon__img {
   width: 100%;
   height: auto;

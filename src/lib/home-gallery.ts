@@ -1,5 +1,6 @@
 import { getContent, getArticles } from "@/lib/content";
 import { MAKAROV_ARTICLE_ID, MAKAROV_AWARD_IMAGE } from "@/lib/makarov-media";
+import { HOME_RIBBON_IMAGE } from "@/lib/site-media";
 import { extractNewsImage, sortNewsByDate } from "@/lib/news-media";
 
 export type HomeGalleryItem = {
@@ -13,6 +14,10 @@ function normalizeSrc(src: string): string {
   return src.split("?")[0].toLowerCase();
 }
 
+const EXCLUDED_ON_HOME = new Set([
+  normalizeSrc(MAKAROV_AWARD_IMAGE),
+]);
+
 function addUnique(
   items: HomeGalleryItem[],
   seen: Set<string>,
@@ -20,7 +25,7 @@ function addUnique(
   limit: number,
 ) {
   const key = normalizeSrc(item.src);
-  if (!item.src || seen.has(key) || items.length >= limit) return;
+  if (!item.src || seen.has(key) || EXCLUDED_ON_HOME.has(key) || items.length >= limit) return;
   seen.add(key);
   items.push({
     ...item,
@@ -76,11 +81,11 @@ function collectPressAndNewsPool(limit: number): HomeGalleryItem[] {
   return pool;
 }
 
-const makarovItem = (): HomeGalleryItem => ({
-  src: MAKAROV_AWARD_IMAGE,
-  alt: "Сергей Макаров и Президент Республики Казахстан",
-  caption: "Благодарность Президента · 2025",
-  href: `/article/details/${MAKAROV_ARTICLE_ID}`,
+const astanaRibbonItem = (): HomeGalleryItem => ({
+  src: HOME_RIBBON_IMAGE,
+  alt: "Астана — столица Казахстана",
+  caption: "Астана",
+  href: "/about",
 });
 
 type HomeVisualPlan = {
@@ -91,13 +96,13 @@ type HomeVisualPlan = {
 
 let cachedPlan: HomeVisualPlan | undefined;
 
-/** Один план на главную: без повторов между лентой, полосой и галереей. */
+/** Один план на главную: лента — Астана; без фото Макарова; без повторов. */
 function getHomeVisualPlan(): HomeVisualPlan {
   if (cachedPlan) return cachedPlan;
 
   const pool = collectPressAndNewsPool(40);
   const used = new Set<string>();
-  const ribbon = makarovItem();
+  const ribbon = astanaRibbonItem();
   used.add(normalizeSrc(ribbon.src));
 
   const charts: HomeGalleryItem[] = [];
@@ -111,7 +116,6 @@ function getHomeVisualPlan(): HomeVisualPlan {
   }
 
   const gallery: HomeGalleryItem[] = [];
-  addUnique(gallery, used, ribbon, 8);
   for (const item of pool) {
     addUnique(gallery, used, item, 8);
   }
@@ -132,8 +136,7 @@ export function getHomeGalleryItems(limit = 8): HomeGalleryItem[] {
   return getHomeVisualPlan().gallery.slice(0, limit);
 }
 
-/** Пути /uploads/ для CI (без локального jpg Макарова). */
-/** Src уже на главной (лента, полоса, галерея) — не дублировать в пресс-блоке. */
+/** Src уже на главной — не дублировать в пресс-блоке. */
 export function getUsedHomeImageSrcs(): Set<string> {
   const plan = getHomeVisualPlan();
   const used = new Set<string>();
