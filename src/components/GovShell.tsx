@@ -16,7 +16,6 @@ export function GovShell({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [finOpen, setFinOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -26,6 +25,11 @@ export function GovShell({
       router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       setSearchOpen(false);
     }
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
   };
 
   return (
@@ -68,49 +72,22 @@ export function GovShell({
           </button>
         </div>
 
-        <nav className={`ardfm-nav ${menuOpen ? "ardfm-nav--open" : ""}`} aria-label="Основное меню">
+        <nav
+          className={`ardfm-nav ardfm-nav--entity ${menuOpen ? "ardfm-nav--open" : ""}`}
+          aria-label="Основное меню"
+        >
           <ul className="ardfm-nav__list">
-            {MAIN_NAV.map((item) => {
-              if ("children" in item && item.children) {
-                return (
-                  <li key={item.label} className="ardfm-nav__item ardfm-nav__item--dropdown">
-                    <button
-                      type="button"
-                      className={`ardfm-nav__link ${finOpen ? "active" : ""}`}
-                      onClick={() => setFinOpen((v) => !v)}
-                    >
-                      {item.label} ▾
-                    </button>
-                    {finOpen && (
-                      <ul className="ardfm-nav__sub">
-                        {item.children.map((c) => (
-                          <li key={c.href}>
-                            <Link href={c.href} className="ardfm-nav__sublink">
-                              {c.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                );
-              }
-              const external = "external" in item && item.external;
-              const active = !external && item.href !== "#" && pathname.startsWith(item.href);
-              return (
-                <li key={item.href} className="ardfm-nav__item">
-                  {external ? (
-                    <a href={item.href} className="ardfm-nav__link" target="_blank" rel="noreferrer">
-                      {item.label}
-                    </a>
-                  ) : (
-                    <Link href={item.href} className={`ardfm-nav__link ${active ? "active" : ""}`}>
-                      {item.label}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
+            {MAIN_NAV.map((item) => (
+              <li key={item.href} className="ardfm-nav__item">
+                <Link
+                  href={item.href}
+                  className={`ardfm-nav__link ${isActive(item.href) ? "active" : ""}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
           <button
             type="button"
@@ -136,7 +113,10 @@ export function GovShell({
         )}
       </header>
 
-      <main id="main" className="ardfm-main">
+      <main
+        id="main"
+        className={`ardfm-main${pathname === "/" || pathname === "" ? " ardfm-main--home" : ""}`}
+      >
         {children}
       </main>
 
@@ -154,13 +134,17 @@ export function GovShell({
             </p>
           </div>
           <div>
-            <p className="ardfm-footer__title">Полезные ссылки</p>
+            <p className="ardfm-footer__title">Разделы сайта</p>
             <ul>
               {FOOTER_LINKS.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} target="_blank" rel="noreferrer">
-                    {l.label}
-                  </a>
+                  {l.href.startsWith("http") ? (
+                    <a href={l.href} target="_blank" rel="noreferrer">
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link href={l.href}>{l.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -171,6 +155,9 @@ export function GovShell({
               <a href="https://t.me/govkz_news" target="_blank" rel="noreferrer">
                 Telegram
               </a>
+              <a href="https://www.fingramota.kz" target="_blank" rel="noreferrer">
+                Fingramota.kz
+              </a>
             </div>
           </div>
         </div>
@@ -179,7 +166,6 @@ export function GovShell({
           <a href={meta.source} target="_blank" rel="noreferrer">
             gov.kz/ardfm
           </a>
-          . Разработано в АО «Национальные информационные технологии»
         </p>
       </footer>
     </div>

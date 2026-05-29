@@ -14,15 +14,21 @@ export function collectStaticSlugs(content: SiteContent): { slug: string[] }[] {
 
   const extraRoutes = [
     ["press", "news"],
+    ["press", "releases"],
     ["press", "events"],
     ["articles"],
     ["documents", "1"],
+    ["about", "faq"],
+    ["about", "structure"],
+    ["activities", "population"],
   ];
   for (const r of extraRoutes) addSlug(seen, r);
 
   for (const p of content.pages) {
+    if (p.slug === "finansovye-rynki" || p.title === "Финансовые рынки") continue;
     const link = p.internal_link?.replace(/^\//, "").replace(/\/$/, "");
-    if (link) addSlug(seen, link.split("/"));
+    if (!link || link === "") continue;
+    addSlug(seen, link.split("/"));
   }
 
   for (const n of content.news) {

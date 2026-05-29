@@ -1,11 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ActivitiesDirections } from "@/components/ActivitiesDirections";
+import { ContactsPage } from "@/components/ContactsPage";
+import { FaqPage } from "@/components/FaqPage";
 import { HomePage } from "@/components/HomePage";
 import { HtmlContent } from "@/components/HtmlContent";
 import { NewsCard } from "@/components/NewsCard";
 import { ArticlesList } from "@/components/ArticlesList";
+import { DocumentsPage } from "@/components/DocumentsPage";
+import { PressCenterPage } from "@/components/PressCenterPage";
+import { SectionPage } from "@/components/SectionPage";
 import { findNewsById, findPageByPath, getArticles, getContent } from "@/lib/content";
 import { formatDate } from "@/lib/format";
+import {
+  filterSectionContent,
+  getSectionConfig,
+} from "@/lib/sections";
+import { sortNewsByDate } from "@/lib/news-media";
 import { collectStaticSlugs } from "@/lib/static-paths";
 
 type Props = { params: Promise<{ slug?: string[] }> };
@@ -48,36 +59,50 @@ export default async function DynamicPage({ params }: Props) {
 
   // Список новостей
   if (pathname === "/press/news" || pathname === "/press" || pathname === "/press/") {
+    return <PressCenterPage news={sortNewsByDate(content.news)} activePath="/press/news" />;
+  }
+
+  if (pathname === "/press/releases") {
+    const releases = [...content.pressReleases].sort((a, b) =>
+      (b.created_date ?? "").localeCompare(a.created_date ?? ""),
+    );
     return (
       <>
         <nav className="breadcrumb">
-          <Link href="/">Главная</Link> / Пресс-центр
+          <Link href="/">Главная</Link> / <Link href="/press/news">Пресс-центр</Link> / Пресс-релизы
         </nav>
-        <h1 className="page-title">Все материалы</h1>
-        {content.news.map((n) => (
-          <NewsCard key={n.id} item={n} />
-        ))}
+        <h1 className="page-title">Пресс-релизы</h1>
+        <nav className="home-press__tabs" aria-label="Разделы пресс-центра">
+          <Link href="/press/news" className="home-press__tab">
+            Все материалы
+          </Link>
+          <Link href="/press/releases" className="home-press__tab home-press__tab--active">
+            Пресс-релизы
+          </Link>
+          <Link href="/press/events" className="home-press__tab">
+            События
+          </Link>
+        </nav>
+        <ul className="doc-list">
+          {releases.map((r) => (
+            <li key={r.id}>
+              <Link href={`/press/releases/details/${r.id}`}>{r.title}</Link>
+              <time>{formatDate(r.created_date)}</time>
+            </li>
+          ))}
+        </ul>
       </>
     );
   }
 
-  // Документы
-  if (pathname.startsWith("/documents")) {
+  // Документы (список)
+  if (pathname === "/documents/1" || pathname === "/documents") {
     return (
       <>
         <nav className="breadcrumb">
           <Link href="/">Главная</Link> / Документы
         </nav>
-        <h1 className="page-title">Документы</h1>
-        <ul className="doc-list">
-          {content.documents.map((d) => (
-            <li key={d.id}>
-              <Link href={`/documents/item/${d.id}`}>{d.title}</Link>
-              <time>{formatDate(d.created_date)}</time>
-              {d.type?.title && <span> — {d.type.title}</span>}
-            </li>
-          ))}
-        </ul>
+        <DocumentsPage documents={content.documents} />
       </>
     );
   }
@@ -98,51 +123,12 @@ export default async function DynamicPage({ params }: Props) {
     );
   }
 
-  // Контакты
+  if (pathname === "/about/faq") {
+    return <FaqPage />;
+  }
+
   if (pathname === "/contacts") {
-    const { contacts: c } = content.meta;
-    return (
-      <>
-        <nav className="breadcrumb">
-          <Link href="/">Главная</Link> / Контакты
-        </nav>
-        <h1 className="page-title">Контакты</h1>
-        <div className="contacts-grid">
-          <div>
-            <h2>Адрес</h2>
-            <p>{c.address}</p>
-            <h2>Телефоны</h2>
-            <ul>
-              {c.phones.map((p) => (
-                <li key={p}>
-                  <a href={`tel:${p.replace(/\D/g, "")}`}>{p}</a>
-                </li>
-              ))}
-            </ul>
-            <h2>Электронная почта</h2>
-            <ul>
-              {c.emails.map((e) => (
-                <li key={e}>
-                  <a href={`mailto:${e}`}>{e}</a>
-                </li>
-              ))}
-            </ul>
-            <p>
-              <a href="https://eotinish.kz" className="btn" target="_blank" rel="noreferrer">
-                Онлайн-приемная e-Otinish
-              </a>
-            </p>
-          </div>
-          <div>
-            <div className="map-placeholder">
-              <a href={c.mapUrl} target="_blank" rel="noreferrer">
-                Открыть на Яндекс.Картах
-              </a>
-            </div>
-          </div>
-        </div>
-      </>
-    );
+    return <ContactsPage contacts={content.meta.contacts} />;
   }
 
   // Поиск
@@ -155,20 +141,39 @@ export default async function DynamicPage({ params }: Props) {
     );
   }
 
-  // События
   if (pathname === "/press/events") {
-    const all = [...content.events.upcoming, ...content.events.past];
+    const all = [...content.events.upcoming, ...content.events.past].sort((a, b) =>
+      (b.event_date ?? "").localeCompare(a.event_date ?? ""),
+    );
     return (
       <>
+        <nav className="breadcrumb">
+          <Link href="/">Главная</Link> / <Link href="/press/news">Пресс-центр</Link> / События
+        </nav>
         <h1 className="page-title">Календарь событий</h1>
-        <ul className="event-list">
-          {all.map((e) => (
-            <li key={e.id}>
-              <Link href={`/press/events/details/${e.id}`}>{e.title}</Link>
-              <time>{formatDate(e.event_date)}</time>
-            </li>
-          ))}
-        </ul>
+        <nav className="home-press__tabs" aria-label="Разделы пресс-центра">
+          <Link href="/press/news" className="home-press__tab">
+            Все материалы
+          </Link>
+          <Link href="/press/releases" className="home-press__tab">
+            Пресс-релизы
+          </Link>
+          <Link href="/press/events" className="home-press__tab home-press__tab--active">
+            События
+          </Link>
+        </nav>
+        {all.length === 0 ? (
+          <p>Запланированные мероприятия будут опубликованы в пресс-центре.</p>
+        ) : (
+          <ul className="event-list">
+            {all.map((e) => (
+              <li key={e.id}>
+                <Link href={`/press/events/details/${e.id}`}>{e.title}</Link>
+                <time>{formatDate(e.event_date)}</time>
+              </li>
+            ))}
+          </ul>
+        )}
       </>
     );
   }
@@ -185,21 +190,6 @@ export default async function DynamicPage({ params }: Props) {
         <h1 className="page-title">Статьи и материалы</h1>
         <p style={{ color: "#5c6370", marginBottom: "1.5rem" }}>
           Всего: {articles.length}
-        </p>
-        <ArticlesList articles={articles} />
-      </>
-    );
-  }
-
-  if (pathname === "/about") {
-    return (
-      <>
-        <nav className="breadcrumb">
-          <Link href="/">Главная</Link> / Об Агентстве
-        </nav>
-        <h1 className="page-title">Об Агентстве</h1>
-        <p style={{ color: "#5c6370", marginBottom: "1.5rem" }}>
-          Материалы и публикации ({articles.length})
         </p>
         <ArticlesList articles={articles} />
       </>
@@ -262,28 +252,74 @@ export default async function DynamicPage({ params }: Props) {
   if (projectMatch) {
     const pr = content.projects.find((p) => String(p.id) === projectMatch[1]);
     if (!pr) notFound();
+    const desc = (pr as { description?: string }).description;
     return (
       <article>
+        <nav className="breadcrumb">
+          <Link href="/">Главная</Link> / Проект
+        </nav>
         <h1 className="page-title">{pr.title}</h1>
-        {pr.short_description && <p>{pr.short_description}</p>}
+        {pr.short_description && <p className="section-lead">{pr.short_description}</p>}
+        {desc && <HtmlContent html={desc} />}
       </article>
     );
   }
 
-  // CMS-страница
+  // Разделы с уникальным контентом (об агентстве, деятельность, направления)
+  if (pathname === "/finansovye-rynki" || pathname === "/financial-markets") {
+    return (
+      <>
+        <nav className="breadcrumb">
+          <Link href="/">Главная</Link> / Деятельность
+        </nav>
+        <p>
+          <Link href="/activities/directions" className="btn">
+            Перейти к разделу «Деятельность»
+          </Link>
+        </p>
+      </>
+    );
+  }
+
+  const sectionConfig = getSectionConfig(pathname);
+  if (sectionConfig) {
+    const filtered = filterSectionContent(sectionConfig, content, articles);
+    const isDirections = pathname === "/activities/directions";
+    return (
+      <>
+        <nav className="breadcrumb">
+          <Link href="/">Главная</Link>
+          {pathname.startsWith("/activities") && pathname !== "/activities/directions" ? (
+            <>
+              {" "}
+              / <Link href="/activities/directions">Деятельность</Link>
+            </>
+          ) : null}
+          {pathname !== "/activities/directions" ? <> / {sectionConfig.title}</> : null}
+          {pathname === "/activities/directions" ? <> / Деятельность</> : null}
+        </nav>
+        <SectionPage
+          config={sectionConfig}
+          news={filtered.news}
+          articles={filtered.articles}
+          documents={filtered.documents}
+        >
+          {isDirections && <ActivitiesDirections />}
+        </SectionPage>
+      </>
+    );
+  }
+
+  // CMS-страница (с текстом из API)
   const page = findPageByPath(pathname);
-  if (page) {
+  if (page?.content) {
     return (
       <article>
         <nav className="breadcrumb">
           <Link href="/">Главная</Link> / {page.title}
         </nav>
         <h1 className="page-title">{page.title}</h1>
-        {page.content ? (
-          <HtmlContent html={page.content} />
-        ) : (
-          <p>Раздел: {page.title}</p>
-        )}
+        <HtmlContent html={page.content} />
       </article>
     );
   }
@@ -299,6 +335,9 @@ export async function generateMetadata({ params }: Props) {
     const item = findNewsById(newsMatch[1]);
     if (item) return { title: item.title };
   }
+  if (pathname === "/about/faq") return { title: "Часто задаваемые вопросы" };
+  const sectionConfig = getSectionConfig(pathname);
+  if (sectionConfig) return { title: sectionConfig.title };
   const page = findPageByPath(pathname);
   if (page) return { title: page.seo_title || page.title };
   const articleMatch = pathname.match(/^\/article\/details\/([^/]+)$/);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GovShell } from "@/components/GovShell";
+import { basePath } from "@/lib/base-path";
 import { getContent } from "@/lib/content";
 import "./ardfm.css";
 import "./globals.css";
@@ -7,7 +8,7 @@ import "./globals.css";
 const content = getContent();
 
 const siteUrl =
-  process.env.GITHUB_PAGES === "true"
+  process.env.NEXT_PUBLIC_BASE_PATH === "/regylz"
     ? "https://finmanager063-design.github.io/regylz"
     : "http://localhost:3000";
 
@@ -29,8 +30,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className="notranslate">
       <head>
-        <link rel="stylesheet" href="/styles/gov-main.css" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={`${basePath}/favicon.ico`} />
       </head>
       <body>
         <GovShell meta={content.meta}>{children}</GovShell>

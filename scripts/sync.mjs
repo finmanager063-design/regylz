@@ -21,6 +21,7 @@ const MAX_DOC_PAGES = Number(process.env.SYNC_MAX_DOC_PAGES || 10);
 const MAX_ARTICLE_PAGES = Number(process.env.SYNC_MAX_ARTICLE_PAGES || 80);
 const MAX_PRESS_PAGES = Number(process.env.SYNC_MAX_PRESS_PAGES || 30);
 const SKIP_IMAGES = process.env.SYNC_SKIP_IMAGES === "1";
+const MAX_HOME_IMAGES = Number(process.env.SYNC_MAX_IMAGES || 12);
 
 async function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -97,34 +98,68 @@ async function gqlPaginated(field, fragment, pageSize = 15, maxPages = 80) {
   return all;
 }
 
-async function downloadUploadsFromHtml(html) {
+async function downloadUpload(rel) {
+  if (!rel?.startsWith("/uploads/")) return;
+  const local = path.join(ROOT, "public", rel);
+  await fs.mkdir(path.dirname(local), { recursive: true });
+  try {
+    await fs.access(local);
+    return;
+  } catch {
+    /* download */
+  }
+  const res = await fetch(`https://www.gov.kz${rel}`, { headers: { "User-Agent": UA } });
+  if (res.ok) {
+    await fs.writeFile(local, Buffer.from(await res.arrayBuffer()));
+    process.stdout.write(`  img ${rel}\n`);
+  }
+}
+
+async function downloadUploadsFromHtml(html, limit = Infinity) {
   const urls = [
     ...html.matchAll(/(?:src|href)="(\/uploads\/[^"]+)"/g),
   ].map((m) => m[1]);
+  let n = 0;
   for (const rel of [...new Set(urls)]) {
-    const local = path.join(ROOT, "public", rel);
-    await fs.mkdir(path.dirname(local), { recursive: true });
-    try {
-      await fs.access(local);
-      continue;
-    } catch {
-      /* download */
-    }
-    const res = await fetch(`https://www.gov.kz${rel}`, { headers: { "User-Agent": UA } });
-    if (res.ok) {
-      await fs.writeFile(local, Buffer.from(await res.arrayBuffer()));
+    if (n >= limit) break;
+    await downloadUpload(rel);
+    n++;
+  }
+}
+
+function collectHomeImagePaths(news, projects, limit) {
+  const paths = new Set();
+  const sorted = [...news].sort((a, b) =>
+    (b.created_date || "").localeCompare(a.created_date || ""),
+  );
+  for (const item of sorted) {
+    const body = item.body || "";
+    for (const m of body.matchAll(/src="(\/uploads\/[^"]+)"/g)) {
+      paths.add(m[1]);
+      if (paths.size >= limit) return [...paths];
     }
   }
+  for (const p of projects || []) {
+    if (p.icon) paths.add(p.icon);
+    if (paths.size >= limit) break;
+  }
+  return [...paths].slice(0, limit);
 }
 
 async function main() {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.mkdir(UPLOADS_DIR, { recursive: true });
 
+  const isFinancialMarketsPage = (p) =>
+    p?.slug === "finansovye-rynki" ||
+    p?.title === "Финансовые рынки" ||
+    (p?.internal_link === "/" && p?.slug === "finansovye-rynki");
+
   console.log("→ Меню и страницы (REST)…");
-  const menuPages = await fetchJson(
+  const menuPagesRaw = await fetchJson(
     `https://www.gov.kz/api/v1/public/content-manager/pages?projects=contains:${PROJECT}&sort-by=order&size=1000`,
   );
+  const menuPages = menuPagesRaw.filter((p) => !isFinancialMarketsPage(p));
 
   console.log("→ Страницы (GraphQL)…");
   const pagesData = await gql(`{
@@ -132,7 +167,7 @@ async function main() {
       id slug title content internal_link is_menu_item order description_seo seo_title
     }
   }`);
-  const pages = pagesData.pages || [];
+  const pages = (pagesData.pages || []).filter((p) => !isFinancialMarketsPage(p));
 
   console.log("→ Новости…");
   const news = await gqlPaginated(
@@ -220,11 +255,15 @@ async function main() {
   }
   const uniqueArticles = [...articleById.values()];
 
+  const sortedNews = [...news].sort((a, b) =>
+    (b.created_date || "").localeCompare(a.created_date || ""),
+  );
+
   const payload = {
     meta,
     menuPages,
     pages,
-    news,
+    news: sortedNews,
     documents,
     events: { upcoming: eventsUpcoming, past: eventsPast },
     projects,
@@ -239,13 +278,11 @@ async function main() {
   );
 
   if (!SKIP_IMAGES) {
-    console.log("→ Загрузка изображений из контента…");
-    const htmlBlob = [
-      ...pages.map((p) => p.content || ""),
-      ...news.map((n) => (n.body || "") + (n.short_description || "")),
-      ...articles.map((a) => a.content || ""),
-    ].join("");
-    await downloadUploadsFromHtml(htmlBlob);
+    console.log(`→ Загрузка до ${MAX_HOME_IMAGES} изображений для главной…`);
+    for (const rel of collectHomeImagePaths(sortedNews, projects, MAX_HOME_IMAGES)) {
+      await downloadUpload(rel);
+      await sleep(200);
+    }
   }
 
   console.log("\n✓ Готово:");

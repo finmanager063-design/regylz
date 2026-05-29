@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { formatDate, mediaUrl } from "@/lib/format";
+import { GovImage } from "@/components/GovImage";
+import { formatDate } from "@/lib/format";
+import { extractNewsImage } from "@/lib/news-media";
 import type { GovNews } from "@/lib/types";
 
 export function NewsCard({ item }: { item: GovNews }) {
-  const img = mediaUrl(item.heropic);
+  const img = extractNewsImage(item);
   return (
     <article className="news-card">
       {img && (
         <Link href={`/press/news/details/${item.id}`} className="news-card__img">
-          <img src={img} alt="" loading="lazy" />
+          <GovImage src={img} alt="" />
         </Link>
       )}
       <div className="news-card__body">

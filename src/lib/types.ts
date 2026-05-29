@@ -47,6 +47,7 @@ export interface GovProject {
   title: string;
   short_description?: string;
   heropic?: string;
+  icon?: string;
   internal_link?: string;
   slug?: string;
 }
