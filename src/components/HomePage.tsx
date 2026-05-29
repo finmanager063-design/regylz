@@ -4,12 +4,12 @@ import { MarketChartsStrip } from "@/components/MarketChartsStrip";
 import { VisualGallery } from "@/components/VisualGallery";
 import { GovImage } from "@/components/GovImage";
 import { getContent } from "@/lib/content";
-import { getHomeGalleryItems } from "@/lib/home-gallery";
+import { getHomeRibbonItem } from "@/lib/home-gallery";
 
 export function HomePage() {
   const { projects } = getContent();
   const banners = projects.filter((p) => p.icon || p.heropic).slice(0, 6);
-  const ribbon = getHomeGalleryItems(1)[0];
+  const ribbon = getHomeRibbonItem();
 
   return (
     <div className="home-page">

@@ -1180,6 +1180,24 @@
   box-shadow: 0 12px 40px rgba(0, 175, 202, 0.35);
 }
 
+.article-figure--award img {
+  border-color: #fec50c;
+  object-fit: cover;
+  max-height: min(72vh, 712px);
+  width: 100%;
+}
+
+.article-highlight--award {
+  text-align: center;
+  border-color: #fec50c;
+}
+
+.article-meta-line {
+  font-size: 0.9rem;
+  color: var(--gov-muted);
+  margin: 0 0 1.5rem;
+}
+
 .article-figure figcaption {
   font-size: 0.85rem;
   color: var(--gov-muted);

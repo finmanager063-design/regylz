@@ -1,37 +1,27 @@
-import { mediaSrc, KZ_IMAGES } from "./site-media";
+import { mediaSrc } from "./site-media";
+import { MAKAROV_ARTICLE_ID, MAKAROV_AWARD_IMAGE } from "./makarov-media";
 import type { SiteContent } from "./types";
 
-const MAKAROV_ID = "featured-makarov-award-2025";
+const awardPhoto = mediaSrc(MAKAROV_AWARD_IMAGE);
 
 const makarovHtml = `
-<figure class="article-figure article-figure--hero">
-  <img src="${mediaSrc("/uploads/2025/10/8/86e8caa3c4cf52cddf8953304f3a9c7c_original.4113520.jpg")}" alt="Благодарность Президента Республики Казахстан — Сергей Макаров" width="900" height="500"/>
-  <figcaption>Официальная благодарность за вклад в защиту прав потребителей финансовых услуг</figcaption>
+<figure class="article-figure article-figure--hero article-figure--award">
+  <img src="${awardPhoto}" alt="Сергей Макаров и Президент Республики Казахстан Касым-Жомарт Токаев" width="1024" height="712" loading="eager" decoding="async"/>
+  <figcaption>Официальная церемония в Астане · фото с материала legalconsult.art</figcaption>
 </figure>
 
 <p class="article-lead"><strong>Государственное признание · 2025.</strong> Сергей Макаров удостоен официальной благодарности за многолетний вклад в возврат средств гражданам, пострадавшим от недобросовестных участников финансового рынка, и за выстраивание практики взаимодействия с Агентством Республики Казахстан по регулированию и развитию финансового рынка (АРРФР).</p>
 
-<div class="article-highlight">
-  <h2>Благодарственное письмо</h2>
+<div class="article-highlight article-highlight--award">
+  <p><strong>Благодарственное письмо</strong></p>
   <p><em>За вклад в защиту прав потребителей финансовых услуг и содействие восстановлению справедливости.</em></p>
 </div>
 
-<figure class="article-figure">
-  <img src="${mediaSrc(KZ_IMAGES.flagBanner)}" alt="Символика Республики Казахстан" width="1200" height="280"/>
-</figure>
+<p class="article-meta-line"><time datetime="2025-11-14">Астана · 14 ноября 2025</time> · защита прав граждан на финансовом рынке</p>
 
 <h2>Как это произошло</h2>
 <p>В 2025 году по итогам работы с крупными кейсами — возврат средств клиентам на суммы свыше сотен миллионов тенге и координация с АРРФР — деятельность Сергея Макарова была отмечена на уровне государства.</p>
 <p>На церемонии в Астане, посвящённой защите прав граждан на финансовом рынке, представители правоохранительного и надзорного блока отметили практику «гонорара успеха»: клиент платит юристу только после фактического зачисления денег — это снижает число повторных обращений и повышает доверие к правовым механизмам.</p>
-
-<div class="article-charts-row">
-  <figure class="article-figure">
-    <img src="${mediaSrc(KZ_IMAGES.chartSectors)}" alt="Секторы финансового рынка под надзором" width="640" height="360"/>
-  </figure>
-  <figure class="article-figure">
-    <img src="${mediaSrc(KZ_IMAGES.chartGrowth)}" alt="Динамика защиты прав потребителей" width="640" height="360"/>
-  </figure>
-</div>
 
 <h2>За что именно наградили</h2>
 <ul>
@@ -50,23 +40,23 @@ const makarovHtml = `
 <h2>Что это значит для клиентов</h2>
 <p>Для людей, которые потеряли деньги, награда — дополнительное подтверждение, что подход признан на государственном уровне. Работа ведётся онлайн по всему Казахстану, взаимодействие с АРРФР сохраняется, первая консультация — бесплатно.</p>
 
-<p><small>Источник материала: <a href="http://legalconsult.art/nagrada.html" target="_blank" rel="noreferrer">legalconsult.art/nagrada.html</a></small></p>
+<p><small>Источник материала и фото: <a href="http://legalconsult.art/nagrada.html" target="_blank" rel="noreferrer">legalconsult.art/nagrada.html</a></small></p>
 `;
 
 export const FEATURED_ARTICLES: SiteContent["articles"] = [
   {
-    id: MAKAROV_ID,
+    id: MAKAROV_ARTICLE_ID,
     title:
       "Благодарность Президента Республики Казахстан: награда Сергею Макарову за вклад в защиту прав на финансовом рынке",
     alias: "blagodarnost-prezidenta-makarov",
     short_description:
-      "Официальная благодарность за возврат средств гражданам и сотрудничество с АРРФР. Церемония в Астане, 2025 год.",
+      "Официальная благодарность за возврат средств гражданам и сотрудничество с АРРФР. Церемония в Астане, 14 ноября 2025 года.",
     publication_date: "2025-11-20T10:00:00Z",
-    heropic: "/uploads/2025/10/8/86e8caa3c4cf52cddf8953304f3a9c7c_original.4113520.jpg",
+    heropic: MAKAROV_AWARD_IMAGE,
     content: makarovHtml,
   },
 ];
 
 export function isFeaturedArticleId(id: string): boolean {
-  return id === MAKAROV_ID;
+  return id === MAKAROV_ARTICLE_ID;
 }

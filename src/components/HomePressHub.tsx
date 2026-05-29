@@ -3,12 +3,16 @@ import { GovImage } from "@/components/GovImage";
 import { getContent } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { HOME_IMPORTANT_LINKS, HOME_PRESS_TABS } from "@/lib/home-data";
+import { isSrcUsedOnHome } from "@/lib/home-gallery";
 import { extractNewsImage, newsWithImages, sortNewsByDate } from "@/lib/news-media";
 
 export function HomePressHub() {
   const { news } = getContent();
   const sorted = sortNewsByDate(news);
-  const withImages = newsWithImages(news, 20);
+  const withImages = newsWithImages(news, 40).filter((item) => {
+    const src = extractNewsImage(item);
+    return src && !isSrcUsedOnHome(src);
+  });
 
   const featured = withImages[0] ?? sorted[0];
   const secondary = withImages.slice(1, 3);

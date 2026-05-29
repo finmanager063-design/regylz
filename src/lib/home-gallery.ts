@@ -1,6 +1,7 @@
 import { getContent, getArticles } from "@/lib/content";
-import { FEATURED_ARTICLES } from "@/lib/featured-articles";
-import { extractNewsImage, newsWithImages, sortNewsByDate } from "@/lib/news-media";
+import { MAKAROV_ARTICLE_ID, MAKAROV_AWARD_IMAGE } from "@/lib/makarov-media";
+import { extractNewsImage, sortNewsByDate } from "@/lib/news-media";
+
 export type HomeGalleryItem = {
   src: string;
   alt: string;
@@ -8,79 +9,150 @@ export type HomeGalleryItem = {
   href: string;
 };
 
+function normalizeSrc(src: string): string {
+  return src.split("?")[0].toLowerCase();
+}
+
 function addUnique(
   items: HomeGalleryItem[],
   seen: Set<string>,
-  src: string,
-  alt: string,
-  caption: string,
-  href: string,
+  item: HomeGalleryItem,
   limit: number,
 ) {
-  if (!src || seen.has(src) || items.length >= limit) return;
-  seen.add(src);
+  const key = normalizeSrc(item.src);
+  if (!item.src || seen.has(key) || items.length >= limit) return;
+  seen.add(key);
   items.push({
-    src,
-    alt,
-    caption: caption.length > 96 ? `${caption.slice(0, 93)}…` : caption,
-    href,
+    ...item,
+    caption: item.caption.length > 96 ? `${item.caption.slice(0, 93)}…` : item.caption,
   });
 }
 
-/** Галерея и полоса графиков: фото из пресс-релизов, новостей и статей с ссылками на материалы. */
-export function getHomeGalleryItems(limit = 8): HomeGalleryItem[] {
+/** Кандидаты: пресс-релизы → новости → статьи (без Макарова). */
+function collectPressAndNewsPool(limit: number): HomeGalleryItem[] {
   const { news, pressReleases } = getContent();
   const articles = getArticles();
-  const items: HomeGalleryItem[] = [];
+  const pool: HomeGalleryItem[] = [];
   const seen = new Set<string>();
-
-  const makarov = FEATURED_ARTICLES[0];
-  const makarovImg =
-    extractNewsImage(makarov) ||
-    extractNewsImage(sortNewsByDate(pressReleases)[0] ?? {}) ||
-    extractNewsImage(newsWithImages(news, 1)[0] ?? {});
-  if (makarovImg) {
-    addUnique(
-      items,
-      seen,
-      makarovImg,
-      makarov.title,
-      "Благодарность Президента · 2025",
-      `/article/details/${makarov.id}`,
-      limit,
-    );
-  }
 
   for (const pr of sortNewsByDate(pressReleases)) {
     const src = extractNewsImage(pr);
     if (src) {
-      addUnique(items, seen, src, pr.title, pr.title, `/press/releases/details/${pr.id}`, limit);
+      addUnique(
+        pool,
+        seen,
+        { src, alt: pr.title, caption: pr.title, href: `/press/releases/details/${pr.id}` },
+        limit,
+      );
     }
   }
 
-  for (const n of newsWithImages(news, 30)) {
+  const sortedNews = sortNewsByDate(news);
+  for (const n of sortedNews) {
     const src = extractNewsImage(n);
     if (src) {
-      addUnique(items, seen, src, n.title, n.title, `/press/news/details/${n.id}`, limit);
+      addUnique(
+        pool,
+        seen,
+        { src, alt: n.title, caption: n.title, href: `/press/news/details/${n.id}` },
+        limit,
+      );
     }
   }
 
   for (const a of articles) {
-    if (a.id === makarov.id) continue;
+    if (a.id === MAKAROV_ARTICLE_ID) continue;
     const src = extractNewsImage({ body: a.content, heropic: a.heropic });
     if (src) {
-      addUnique(items, seen, src, a.title, a.title, `/article/details/${a.id}`, limit);
+      addUnique(
+        pool,
+        seen,
+        { src, alt: a.title, caption: a.title, href: `/article/details/${a.id}` },
+        limit,
+      );
     }
   }
 
-  return items;
+  return pool;
+}
+
+const makarovItem = (): HomeGalleryItem => ({
+  src: MAKAROV_AWARD_IMAGE,
+  alt: "Сергей Макаров и Президент Республики Казахстан",
+  caption: "Благодарность Президента · 2025",
+  href: `/article/details/${MAKAROV_ARTICLE_ID}`,
+});
+
+type HomeVisualPlan = {
+  ribbon: HomeGalleryItem;
+  charts: HomeGalleryItem[];
+  gallery: HomeGalleryItem[];
+};
+
+let cachedPlan: HomeVisualPlan | undefined;
+
+/** Один план на главную: без повторов между лентой, полосой и галереей. */
+function getHomeVisualPlan(): HomeVisualPlan {
+  if (cachedPlan) return cachedPlan;
+
+  const pool = collectPressAndNewsPool(40);
+  const used = new Set<string>();
+  const ribbon = makarovItem();
+  used.add(normalizeSrc(ribbon.src));
+
+  const charts: HomeGalleryItem[] = [];
+  for (const item of pool) {
+    if (charts.length >= 2) break;
+    const key = normalizeSrc(item.src);
+    if (!used.has(key)) {
+      used.add(key);
+      charts.push(item);
+    }
+  }
+
+  const gallery: HomeGalleryItem[] = [];
+  addUnique(gallery, used, ribbon, 8);
+  for (const item of pool) {
+    addUnique(gallery, used, item, 8);
+  }
+
+  cachedPlan = { ribbon, charts, gallery };
+  return cachedPlan;
+}
+
+export function getHomeRibbonItem(): HomeGalleryItem {
+  return getHomeVisualPlan().ribbon;
 }
 
 export function getChartsStripItems(): HomeGalleryItem[] {
-  return getHomeGalleryItems(12).slice(0, 2);
+  return getHomeVisualPlan().charts;
 }
 
-/** Пути /uploads/ для CI-скачивания */
+export function getHomeGalleryItems(limit = 8): HomeGalleryItem[] {
+  return getHomeVisualPlan().gallery.slice(0, limit);
+}
+
+/** Пути /uploads/ для CI (без локального jpg Макарова). */
+/** Src уже на главной (лента, полоса, галерея) — не дублировать в пресс-блоке. */
+export function getUsedHomeImageSrcs(): Set<string> {
+  const plan = getHomeVisualPlan();
+  const used = new Set<string>();
+  for (const item of [plan.ribbon, ...plan.charts, ...plan.gallery]) {
+    used.add(normalizeSrc(item.src));
+  }
+  return used;
+}
+
+export function isSrcUsedOnHome(src: string): boolean {
+  return getUsedHomeImageSrcs().has(normalizeSrc(src));
+}
+
 export function collectGalleryUploadPaths(limit = 80): string[] {
-  return getHomeGalleryItems(limit).map((i) => i.src);
+  const plan = getHomeVisualPlan();
+  const paths = new Set<string>();
+  for (const item of [...plan.charts, ...plan.gallery]) {
+    if (item.src.startsWith("/uploads/")) paths.add(item.src);
+    if (paths.size >= limit) break;
+  }
+  return [...paths];
 }

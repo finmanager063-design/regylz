@@ -13,10 +13,6 @@ const UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const MAX = Number(process.env.SYNC_MAX_IMAGES || 80);
 
-const FEATURED_UPLOADS = [
-  "/uploads/2025/10/8/86e8caa3c4cf52cddf8953304f3a9c7c_original.4113520.jpg",
-];
-
 function normalizeUpload(rel) {
   if (!rel) return null;
   if (rel.startsWith("http")) {
@@ -60,7 +56,7 @@ try {
   process.exit(1);
 }
 
-const paths = new Set(FEATURED_UPLOADS);
+const paths = new Set();
 
 for (const n of content.news || []) {
   if (n.heropic) paths.add(normalizeUpload(n.heropic));
