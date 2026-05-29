@@ -1,22 +1,20 @@
 import Link from "next/link";
 import { GovImage } from "@/components/GovImage";
-import { getContent } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { HOME_IMPORTANT_LINKS, HOME_PRESS_TABS } from "@/lib/home-data";
 import { isSrcUsedOnHome } from "@/lib/home-gallery";
-import { extractNewsImage, newsWithImages, sortNewsByDate } from "@/lib/news-media";
+import { extractNewsImage } from "@/lib/news-media";
+import { getPressHubFeed } from "@/lib/press-hub";
 
 export function HomePressHub() {
-  const { news } = getContent();
-  const sorted = sortNewsByDate(news);
-  const withImages = newsWithImages(news, 40).filter((item) => {
+  const feed = getPressHubFeed(60).filter((item) => {
     const src = extractNewsImage(item);
     return src && !isSrcUsedOnHome(src);
   });
 
-  const featured = withImages[0] ?? sorted[0];
-  const secondary = withImages.slice(1, 3);
-  const listItems = sorted.slice(0, 4);
+  const featured = feed[0];
+  const secondary = feed.slice(1, 3);
+  const listItems = feed.slice(0, 4);
 
   const featuredImg = featured ? extractNewsImage(featured) : "";
 
@@ -37,10 +35,7 @@ export function HomePressHub() {
       <div className="home-press__grid">
         <div className="home-press__visual">
           {featured && (
-            <Link
-              href={`/press/news/details/${featured.id}`}
-              className="home-press__hero-card"
-            >
+            <Link href={featured.detailHref} className="home-press__hero-card">
               {featuredImg ? (
                 <GovImage src={featuredImg} alt="" className="home-press__hero-img" loading="eager" />
               ) : (
@@ -58,11 +53,7 @@ export function HomePressHub() {
               {secondary.map((item) => {
                 const img = extractNewsImage(item);
                 return (
-                  <Link
-                    key={item.id}
-                    href={`/press/news/details/${item.id}`}
-                    className="home-press__thumb-card"
-                  >
+                  <Link key={item.id} href={item.detailHref} className="home-press__thumb-card">
                     {img ? (
                       <GovImage src={img} alt="" className="home-press__thumb-img" />
                     ) : (
@@ -84,7 +75,7 @@ export function HomePressHub() {
             {listItems.map((item) => (
               <li key={item.id}>
                 <time dateTime={item.created_date}>{formatDate(item.created_date)}</time>
-                <Link href={`/press/news/details/${item.id}`}>{item.title}</Link>
+                <Link href={item.detailHref}>{item.title}</Link>
               </li>
             ))}
           </ul>

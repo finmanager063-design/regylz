@@ -1,7 +1,7 @@
 import { assetPath } from "./base-path";
 import { govMediaUrl, localMediaUrl } from "./format";
 
-/** Лёгкая заглушка, если локальный и gov.kz файл недоступны. */
+/** Лёгкая заглушка — только если gov.kz и локальная копия недоступны. */
 export const IMAGE_PLACEHOLDER =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -34,12 +34,19 @@ export function extractMediaPath(src?: string | null): string | null {
   return null;
 }
 
+/** Для /uploads/ сначала gov.kz (всегда актуально), затем локальная копия после CI. */
 export function resolveMediaUrl(src: string | null | undefined, stage: 0 | 1 | 2): string {
   const mediaPath = extractMediaPath(src);
   if (!mediaPath && !src) return IMAGE_PLACEHOLDER;
 
   if (mediaPath?.startsWith("/images/")) {
     return stage === 2 ? IMAGE_PLACEHOLDER : assetPath(mediaPath);
+  }
+
+  if (mediaPath?.startsWith("/uploads/")) {
+    if (stage === 0) return govMediaUrl(mediaPath);
+    if (stage === 1) return localMediaUrl(mediaPath);
+    return IMAGE_PLACEHOLDER;
   }
 
   if (stage === 0) {
@@ -51,7 +58,7 @@ export function resolveMediaUrl(src: string | null | undefined, stage: 0 | 1 | 2
   return IMAGE_PLACEHOLDER;
 }
 
-/** Fallback для &lt;img&gt; внутри HTML-тел статей и новостей. */
+/** Fallback для img в HTML-телах статей и новостей. */
 export function attachImageFallbacks(root: HTMLElement): () => void {
   const cleanups: Array<() => void> = [];
 
@@ -62,6 +69,16 @@ export function attachImageFallbacks(root: HTMLElement): () => void {
 
     const onError = () => {
       if (mediaPath?.startsWith("/images/")) {
+        stage = 2;
+        img.src = IMAGE_PLACEHOLDER;
+        return;
+      }
+      if (mediaPath?.startsWith("/uploads/")) {
+        if (stage === 0) {
+          stage = 1;
+          img.src = localMediaUrl(mediaPath);
+          return;
+        }
         stage = 2;
         img.src = IMAGE_PLACEHOLDER;
         return;

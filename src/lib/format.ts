@@ -47,11 +47,13 @@ export function formatDate(iso?: string): string {
 }
 
 export function rewriteGovHtml(html: string): string {
-  const uploadPrefix = assetPath("/uploads/");
+  const localUploads = assetPath("/uploads/");
+  const govUploads = `${GOV_ORIGIN}/uploads/`;
   return html
-    .replace(/src="\/uploads\//g, `src="${uploadPrefix}`)
-    .replace(/href="\/uploads\//g, `href="${uploadPrefix}`)
-    .replace(/src="https:\/\/www\.gov\.kz\/uploads\//g, `src="${uploadPrefix}`)
+    .replace(/src="\/uploads\//g, `src="${govUploads}`)
+    .replace(/src="https:\/\/www\.gov\.kz\/uploads\//g, `src="${govUploads}`)
+    .replace(/href="\/uploads\//g, `href="${localUploads}`)
+    .replace(/href="https:\/\/www\.gov\.kz\/uploads\//g, `href="${localUploads}`)
     .replace(
       /<img(?![^>]*\bloading=)/gi,
       '<img loading="lazy" decoding="async" ',

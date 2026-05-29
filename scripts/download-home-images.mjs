@@ -1,25 +1,37 @@
 #!/usr/bin/env node
 /**
- * Скачивает фото для главной, галереи и ленты новостей (CI / перед build:pages).
- * Файлы попадают в public/uploads → out/uploads (не в git).
+ * Скачивает все фото /uploads/ из контента (до SYNC_MAX_IMAGES) для GitHub Pages.
  */
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { collectAllUploadPaths, normalizeUpload } from "./collect-upload-paths.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-const MAX = Number(process.env.SYNC_MAX_IMAGES || 80);
+const MAX = Number(process.env.SYNC_MAX_IMAGES || 220);
+const CONCURRENCY = Number(process.env.SYNC_DL_CONCURRENCY || 6);
 
-function normalizeUpload(rel) {
-  if (!rel) return null;
-  if (rel.startsWith("http")) {
-    const m = rel.match(/(\/uploads\/[^\s"']+)/);
-    return m ? m[1] : null;
-  }
-  return rel.startsWith("/") ? rel : `/${rel}`;
+/** Приоритет: свежие пресс-релизы и главная. */
+const PRIORITY = [
+  "/uploads/2026/",
+  "/uploads/2025/",
+  "/uploads/2021/10/13/",
+  "/uploads/2021/4/6/",
+  "/uploads/2020/",
+];
+
+function sortPaths(paths) {
+  return [...paths].sort((a, b) => {
+    const pa = PRIORITY.findIndex((p) => a.includes(p));
+    const pb = PRIORITY.findIndex((p) => b.includes(p));
+    const scoreA = pa === -1 ? 99 : pa;
+    const scoreB = pb === -1 ? 99 : pb;
+    if (scoreA !== scoreB) return scoreA - scoreB;
+    return b.localeCompare(a);
+  });
 }
 
 async function downloadUpload(rel) {
@@ -29,63 +41,45 @@ async function downloadUpload(rel) {
   const local = path.join(ROOT, "public", normalized);
   await fs.mkdir(path.dirname(local), { recursive: true });
   try {
-    await fs.access(local);
-    return true;
+    const st = await fs.stat(local);
+    if (st.size > 500) return true;
   } catch {
     /* download */
   }
 
   const res = await fetch(`https://www.gov.kz${normalized}`, {
-    headers: { "User-Agent": UA, "Accept-Language": "ru" },
+    headers: { "User-Agent": UA, "Accept-Language": "ru", Accept: "image/*" },
   });
   if (!res.ok) {
     console.log("fail", normalized, res.status);
     return false;
   }
-  await fs.writeFile(local, Buffer.from(await res.arrayBuffer()));
-  console.log("ok", normalized);
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (buf.length < 200) {
+    console.log("skip tiny", normalized, buf.length);
+    return false;
+  }
+  await fs.writeFile(local, buf);
+  console.log("ok", normalized, buf.length);
   return true;
 }
 
-const contentPath = path.join(ROOT, "data/content.json");
-let content;
-try {
-  content = JSON.parse(await fs.readFile(contentPath, "utf8"));
-} catch {
-  console.error("No data/content.json — run sync first or commit content.json");
-  process.exit(1);
-}
-
-const paths = new Set();
-
-for (const n of content.news || []) {
-  if (n.heropic) paths.add(normalizeUpload(n.heropic));
-  for (const m of (n.body || "").matchAll(/src="(\/uploads\/[^"]+)"/g)) {
-    paths.add(m[1]);
+async function runPool(items, worker) {
+  let i = 0;
+  let ok = 0;
+  async function next() {
+    while (i < items.length) {
+      const idx = i++;
+      if (await worker(items[idx])) ok++;
+    }
   }
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => next()));
+  return ok;
 }
 
-for (const p of content.projects || []) {
-  if (p.icon) paths.add(normalizeUpload(p.icon));
-  if (p.heropic) paths.add(normalizeUpload(p.heropic));
-}
+const all = sortPaths(await collectAllUploadPaths());
+const list = all.slice(0, MAX);
+console.log(`Downloading ${list.length} of ${all.length} unique uploads…`);
 
-const sortedPr = [...(content.pressReleases || [])].sort((a, b) =>
-  (b.created_date || "").localeCompare(a.created_date || ""),
-);
-for (const pr of sortedPr) {
-  if (pr.heropic) paths.add(normalizeUpload(pr.heropic));
-  for (const m of (pr.body || "").matchAll(/src=["'](\/uploads\/[^"']+)["']/gi)) {
-    paths.add(m[1]);
-  }
-  if (paths.size >= MAX) break;
-}
-
-const list = [...paths].filter(Boolean).slice(0, MAX);
-let ok = 0;
-for (const rel of list) {
-  if (await downloadUpload(rel)) ok++;
-  await new Promise((r) => setTimeout(r, 120));
-}
-
-console.log(`Done: ${ok}/${list.length} images (max ${MAX})`);
+const ok = await runPool(list, downloadUpload);
+console.log(`Done: ${ok}/${list.length} ok (max ${MAX}, total unique ${all.length})`);

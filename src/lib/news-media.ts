@@ -2,7 +2,7 @@ import type { GovNews } from "./types";
 
 const IMG_RE = /src=["'](\/uploads\/[^"']+)["']/i;
 
-/** Первое изображение из HTML-тела новости (как heropic на gov.kz). */
+/** Первое изображение из HTML-тела или heropic. */
 export function extractNewsImage(item: { body?: string; heropic?: string }): string {
   if (item.heropic) return normalizeUploadPath(item.heropic);
   const body = item.body || "";
@@ -24,7 +24,7 @@ export function sortNewsByDate(news: GovNews[]): GovNews[] {
   );
 }
 
-/** Новости с картинкой — для плиток слева на главной. */
+/** Новости с картинкой — для плиток и списков. */
 export function newsWithImages(news: GovNews[], limit = 12): GovNews[] {
   const sorted = sortNewsByDate(news);
   const withImg: GovNews[] = [];
